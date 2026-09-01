@@ -23,3 +23,27 @@
 **Tomorrow:**
 - Add plain-English explanation of query results (not just raw table)
 - Start wrapping pipeline in Streamlit UI
+
+
+## Day 3 — Sep 1, 2026
+**Goal:** Add plain-English result explanations, build the Streamlit UI, and add auto-charting
+
+**What I did:**
+- Built `explain_result()` — takes the SQL result and generates a natural-language answer to the user's original question instead of just showing a raw table
+- Combined query generation, execution, and explanation into a single `ask_and_explain()` pipeline
+- Stress-tested the pipeline across 6+ varied question types: top-N rankings, category aggregations, region filters, time-trend analysis — all handled correctly
+- Refactored notebook prototype code into clean modules: `utils/db.py` (SQLite connection + schema) and `utils/llm.py` (Gemini prompt logic)
+- Built the Streamlit chat interface in `app.py` — chat input, message history, expandable SQL/raw-data view per response
+- Added automatic chart rendering — detects when a query result has a label column + numeric column and renders a bar chart alongside the text answer (skips charting for single-value results)
+
+**What worked:**
+- Full end-to-end flow confirmed in the actual UI: natural language question → SQL generation → execution → plain-English answer → auto-generated chart, all in one interface
+- Time-trend question ("how did revenue trend across 2024") produced both an accurate written summary and a matching bar chart with no manual chart-type selection needed
+
+**What broke / issues:**
+- None major today — mostly integration and polish work building on yesterday's working pipeline
+
+**Tomorrow:**
+- Consider adding a data-cleaning step for known dataset issues (e.g. "Easst" typo in Region column)
+- Explore adding conversation memory / follow-up question handling
+- Start drafting report sections using this progress log
