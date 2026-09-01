@@ -1,3 +1,26 @@
+## Day 1 — Aug 30, 2026
+**Goal:** get initial setup done
+
+**What I did:**
+- Sourced dataset: Superstore sales data (downloaded as .xlsx)
+- Set up project folder structure (notebooks/, utils/, data/, app.py, venv)
+- Loaded dataset into SQLite as "orders" table — columns: Date, Region, Product, Salesperson, Units_Sold, Unit_Price, Category, Revenue, Cost, Profit (2000 rows)
+- Set up Jupyter notebook for prototyping
+- Initial attempt at LLM integration using Anthropic API — got blocked on API key setup (dotenv path issues)
+
+**What worked:**
+- Dataset loaded cleanly into SQLite with no data issues at this stage
+- Project structure set up cleanly, ready for development
+
+**What broke / issues:**
+- Struggled with .env file not loading correctly via python-dotenv (file initially wasn't created, then wasn't found from notebook's working directory)
+
+
+**Tomorrow:**
+- Get LLM → SQL generation actually working
+- Consider local LLM (Ollama) as alternative to avoid API key management(dropped due to hardware scarcity)
+
+
 ## Day 2 — Aug 31, 2026
 **Goal:** Get NL → SQL → result pipeline working end-to-end
 
