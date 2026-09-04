@@ -70,3 +70,26 @@
 - Consider adding a data-cleaning step for known dataset issues (e.g. "Easst" typo in Region column)
 - Explore adding conversation memory / follow-up question handling
 - Start drafting report sections using this progress log
+
+
+## Day 4 — Sep 2, 2026
+**Goal:** Add a data cleaning step to fix data quality issues in the dataset
+
+**What I did:**
+- Inspected all categorical columns (Region, Product, Salesperson, Category) for inconsistencies by printing unique values
+- Found case inconsistencies (e.g. "North"/"NORTH"/"north") and typos (e.g. "Easst", "westt", "tabllet", "MOBLIE") across Region and Product columns
+- Found null values in Region, Product, and Salesperson columns (~2% each individually)
+- Built a `clean_data()` function to standardize casing and fix known typos via a mapping dictionary, then drop rows with nulls in key columns
+- Decided to drop rows with nulls rather than fill them, since it was a small percentage of the data (114 rows total, 5.7%, after accounting for overlapping nulls across columns)
+- Re-saved the cleaned dataset into superstore.db, overwriting the original table
+
+**What worked:**
+- Cleaning function successfully normalized all Region and Product values — verified by re-checking unique values after cleaning
+- SQL generation and execution still worked correctly against the cleaned data
+
+**What broke / issues:**
+- Hit a temporary Gemini API 503 error ("high demand") while testing the explanation step after cleaning — not a code issue, just a transient server-side problem
+
+**Tomorrow:**
+- Re-verify end-to-end pipeline works fully on cleaned data (confirm "Easst" no longer appears in results)
+- Consider adding retry-with-backoff for transient API errors like the 503 hit today
