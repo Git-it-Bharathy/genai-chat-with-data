@@ -32,22 +32,29 @@ Rules:
 
 def explain_result(question: str, sql: str, result) -> str:
     result_text = result.to_string(index=False)
-    
-    prompt = f"""A user asked this question about their data:
-"{question}"
 
-This SQL query was run to answer it:
-{sql}
+    prompt = f"""You are a data analyst. You have already run a query and have the exact result below — you have full access to this data, it is provided to you directly.
 
-Here is the result:
+User's question: "{question}"
+
+Query result (this IS the answer, read it directly):
 {result_text}
 
-Write a short, clear, plain-English answer to the user's original question based on this result.
-Be direct and conversational — 1-2 sentences. Don't mention SQL or the query.
+Task: Write a short, direct, plain-English answer to the user's question using ONLY the numbers/values in the result above.
+
+Rules:
+- You DO have the data — it's right above. Never say you don't have access, can't answer, or need more information.
+- Just state the answer directly, like reading a number off the table and explaining what it means.
+- 1-2 sentences, conversational tone. No SQL mentions.
 """
     response = ollama.chat(model=MODEL, messages=[
         {"role": "user", "content": prompt}
     ])
-    return response['message']['content'].strip()
+    answer = response['message']['content'].strip()
 
+    # Safety net: if the model still refuses despite having the data, fall back to a simple direct statement
+    refusal_phrases = ["i don't have", "i do not have", "i'm sorry", "i am sorry", "cannot answer", "unable to answer", "need more information"]
+    if any(phrase in answer.lower() for phrase in refusal_phrases):
+        answer = f"Based on the data: {result_text}"
 
+    return answer
