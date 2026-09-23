@@ -13,6 +13,8 @@ def generate_sql(schema: str, question: str, error_context: str = None) -> str:
 IMPORTANT: This is SQLite, not PostgreSQL or MySQL. Use SQLite syntax only.
 - For dates, use strftime('%Y', Date), strftime('%m', Date), or strftime('%Y-%m', Date)
 - Keep queries as simple as possible — avoid unnecessary subqueries or aliases when a single query works
+- NEVER use GROUP_CONCAT without DISTINCT — always write GROUP_CONCAT(DISTINCT column) to avoid huge repeated text blobs
+- If a question asks for a "summary", prefer COUNT, AVG, and simple aggregates over concatenating raw text columns
 
 Write a single valid SQLite SELECT query to answer this question:
 "{question}"
@@ -33,6 +35,12 @@ Rules:
 def explain_result(question: str, sql: str, result) -> str:
     result_text = result.to_string(index=False)
 
+    # Hard cap — never feed or display an enormous result blob
+    MAX_CHARS = 1500
+    truncated = len(result_text) > MAX_CHARS
+    if truncated:
+        result_text = result_text[:MAX_CHARS] + "\n...(truncated, result too large to show in full)"
+
     prompt = f"""You are a data analyst. You have already run a query and have the exact result below — you have full access to this data, it is provided to you directly.
 
 User's question: "{question}"
@@ -52,9 +60,8 @@ Rules:
     ])
     answer = response['message']['content'].strip()
 
-    # Safety net: if the model still refuses despite having the data, fall back to a simple direct statement
     refusal_phrases = ["i don't have", "i do not have", "i'm sorry", "i am sorry", "cannot answer", "unable to answer", "need more information"]
     if any(phrase in answer.lower() for phrase in refusal_phrases):
-        answer = f"Based on the data: {result_text}"
+        answer = f"Here's what the data shows: {result_text}"
 
     return answer
